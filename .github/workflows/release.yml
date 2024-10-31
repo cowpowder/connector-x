@@ -6,12 +6,9 @@ on:
 jobs:
   linux-aarch:
     runs-on: ubuntu-latest
-    container: quay.io/pypa/manylinux_2_28_aarch64
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"]
-        # python-version: ["3.9", "3.10", "3.11", "3.12"]
-  
+        python-version: ["3.10"]
     steps:
       - uses: actions/checkout@v4
 
@@ -19,31 +16,16 @@ jobs:
         with:
           python-version: '${{ matrix.python-version }}'
 
-      - name: Check python installation
-        run: |
-          python --version
-          which python
-
-      - name: Set python version
-        run: |
-          echo "/opt/python/cp${{ matrix.python-version[0] }}-cp${{ matrix.python-version[0] }}/bin" >> $GITHUB_PATH
-
-      # Setup QEMU for cross-compilation
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-
-      # Install system dependencies for aarch64
-      - name: Install system dependencies
-        run: |
-          yum install -y openssl11-devel mysql-devel postgresql-devel freetds-devel
-
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           components: rustfmt
-          target: aarch64-unknown-linux
+          target: aarch64-unknown-linux-gnu
           default: true
-
+          
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+  
       - uses: extractions/setup-just@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,48 +35,43 @@ jobs:
       - name: Setup project
         run: |
           just bootstrap-python
-    
       - uses: PyO3/maturin-action@v1
         with:
-          rust-manylinux: 2_28
-          command: build
+          manylinux: 2_28
           target: aarch64
           args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
           before-script-linux: |
-            apt-get update -y
-            apt-get install -y libssl-dev openssl pkg-config libkrb5-dev libgssapi-krb5-2 gcc-aarch64-linux-gnu
-
+              apt-get update -y
+              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
         env:
           SQLITE3_STATIC: 1
-
 
       - name: Copy j4rs dependencies into dist
         run: |
           cp -rf connectorx-python/target/release/jassets connectorx-python/connectorx/dependencies
-
-      # Rebuild the wheel after copying dependencies
+      # rebuild the wheel to incorporate j4rs dependencies
       - uses: PyO3/maturin-action@v1
         with:
-          rust-manylinux: 2_28
-          command: build
+          manylinux: 2_28
           target: aarch64
           args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
           before-script-linux: |
-            apt-get update -y
-            apt-get install -y libssl-dev openssl pkg-config libkrb5-dev libgssapi-krb5-2 gcc-aarch64-linux-gnu
+              apt-get update -y
+              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
+        env:
+          SQLITE3_STATIC: 1
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: "aarch-${{ matrix.python-version[1] }}"
+          name: "ubuntu-arm-latest-${{ matrix.python-version }}"
           path: connectorx-python/target/wheels/*.whl
-
-
+  
   verify:
     runs-on: ubuntu-latest
     needs: [linux-aarch]
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10"]
 
     steps:
       - uses: actions/checkout@v4

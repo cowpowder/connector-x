@@ -6,12 +6,16 @@ on:
 jobs:
   linux-aarch:
     runs-on: ubuntu-latest
-    container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
     strategy:
       matrix:
-        python-version: [[38, "3.8"], [39, "3.9"], [310, "3.10"], [311, "3.11"]]
+        python-version: [[310, "3.10"]]
+        # python-version: [[38, "3.8"], [39, "3.9"], [310, "3.10"], [311, "3.11"]]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '${{ matrix.python-version }}'
 
       - name: Check python installation
         run: |
@@ -24,12 +28,15 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.71.1
+          toolchain: stable
           components: rustfmt
           target: aarch64-unknown-linux-gnu
           default: true
+  
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
 
-      - uses: extractions/setup-just@v1
+      - uses: extractions/setup-just@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,6 +54,8 @@ jobs:
       - uses: PyO3/maturin-action@v1
         with:
           rust-toolchain: 1.71.1
+          manylinux: 2_28
+          target: aarch64
           command: build
           args: -m connectorx-python/Cargo.toml --target aarch64-unknown-linux-gnu -i python --release --manylinux 2_28 --features integrated-auth-gssapi
         env:

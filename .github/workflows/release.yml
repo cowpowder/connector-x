@@ -60,6 +60,7 @@ jobs:
               apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
         env:
           SQLITE3_STATIC: 1
+          LIBRARY_PATH: /usr/lib/aarch64-linux-gnu:$LIBRARY_PATH
 
       - uses: actions/upload-artifact@v4
         with:

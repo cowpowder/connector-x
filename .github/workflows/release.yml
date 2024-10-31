@@ -65,9 +65,6 @@ jobs:
           
         env:
           SQLITE3_STATIC: 1
-          
-        env:
-          SQLITE3_STATIC: 1
 
       - name: Copy j4rs dependencies into dist
         run: |

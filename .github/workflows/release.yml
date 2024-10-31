@@ -55,7 +55,7 @@ jobs:
           before-script-linux: |
               apt-get update -y
               apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
-              apt-get install -y mysql-devel postgresql-devel freetds-devel krb5-libs clang-devel
+
         env:
           SQLITE3_STATIC: 1
 
@@ -71,12 +71,12 @@ jobs:
           args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
           before-script-linux: |
               apt-get update -y
-              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
+              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib libgssapi-krb5-2
 
-      # - uses: actions/upload-artifact@v3
-      #   with:
-      #     name: "aarch-${{ matrix.python-version[1] }}"
-      #     path: connectorx-python/target/wheels/*.whl
+      - uses: actions/upload-artifact@v3
+        with:
+          name: "aarch-${{ matrix.python-version[1] }}"
+          path: connectorx-python/target/wheels/*.whl
 
   verify:
     runs-on: ${{ matrix.os }}

@@ -23,6 +23,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
 
       - name: Build wheel
         uses: PyO3/maturin-action@v1
@@ -33,12 +36,12 @@ jobs:
           args: >
             -i python${{ matrix.python-version }}
             --manifest-path connectorx-python/Cargo.toml
-            --features integrated-auth-gssapi
+
             --out dist
-          before-script-linux: |
-            apt-get update -y
-            dpkg --add-architecture aarch64
-            apt-get install -y libgssapi-krb5-2 libkrb5-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          # before-script-linux: |
+          #   apt-get update -y
+          #   dpkg --add-architecture aarch64
+          #   apt-get install -y libgssapi-krb5-2 libkrb5-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
   verify:
     runs-on: ubuntu-latest

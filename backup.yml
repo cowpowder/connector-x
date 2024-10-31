@@ -46,6 +46,7 @@ jobs:
               apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
         env:
           SQLITE3_STATIC: 1
+          RUST_BACKTRACE: 1
 
       - name: Copy j4rs dependencies into dist
         run: |

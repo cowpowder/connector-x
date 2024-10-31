@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [[310, "3.10"]]
-        # python-version: [[38, "3.8"], [39, "3.9"], [310, "3.10"], [311, "3.11"]]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+  
     steps:
       - uses: actions/checkout@v4
 

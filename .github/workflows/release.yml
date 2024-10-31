@@ -28,13 +28,16 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           command: build
+          manylinux: 2_24
           target: aarch64-unknown-linux-gnu
           args: >
             -i python${{ matrix.python-version }}
             --manifest-path connectorx-python/Cargo.toml
             --features integrated-auth-gssapi
             --out dist
-          manylinux: 2_24
+          before-script-linux: |
+            apt-get update -y
+            apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib libgssapi-krb5-2
 
   verify:
     runs-on: ubuntu-latest

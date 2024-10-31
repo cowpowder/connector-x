@@ -31,7 +31,7 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt
-          target: aarch64-unknown-linux-gnu
+          target: aarch64-unknown-none
           default: true
   
       - name: Setup QEMU
@@ -43,24 +43,18 @@ jobs:
 
       - uses: Gr1N/setup-poetry@v9
 
-      - name: Install tools
-        run: |
-          apt-get update -y
-          apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
-          apt-get install -y epel-release
-          apt-get install -y mysql-devel postgresql-devel freetds-devel krb5-libs clang-devel
-
       - name: Setup project
         run: |
           just bootstrap-python
-
+    
       - uses: PyO3/maturin-action@v1
         with:
-          rust-toolchain: 1.71.1
           manylinux: 2_28
           target: aarch64
-          command: build
-          args: -m connectorx-python/Cargo.toml --target aarch64-unknown-linux-gnu -i python --release --manylinux 2_28 --features integrated-auth-gssapi
+          args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
+          before-script-linux: |
+              apt-get update -y
+              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
         env:
           SQLITE3_STATIC: 1
 
@@ -71,16 +65,17 @@ jobs:
       # rebuild the wheel to incorporate j4rs dependencies
       - uses: PyO3/maturin-action@v1
         with:
-          rust-toolchain: 1.71.1
-          command: build
-          args: -m connectorx-python/Cargo.toml --target aarch64-unknown-linux-gnu -i python --release --manylinux 2_28 --features integrated-auth-gssapi
-        env:
-          SQLITE3_STATIC: 1
+          manylinux: 2_28
+          target: aarch64
+          args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
+          before-script-linux: |
+              apt-get update -y
+              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: "aarch-${{ matrix.python-version[1] }}"
-          path: connectorx-python/target/wheels/*.whl
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: "aarch-${{ matrix.python-version[1] }}"
+      #     path: connectorx-python/target/wheels/*.whl
 
   verify:
     runs-on: ${{ matrix.os }}

@@ -118,7 +118,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: Gr1N/setup-poetry@v9
+      - name: setup Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+          poetry -v
 
       - name: Install tools
         run: |

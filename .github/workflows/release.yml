@@ -27,21 +27,34 @@ jobs:
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
 
-      - name: Build wheel
-        uses: PyO3/maturin-action@v1
-        with:
-          command: build
-          manylinux: 2_24
-          target: aarch64-unknown-linux-gnu
-          args: >
-            -i python${{ matrix.python-version }}
-            --manifest-path connectorx-python/Cargo.toml
+      - name: Pull manylinux AArch64 Docker image
+        run: |
+          docker pull quay.io/pypa/manylinux_2_24_aarch64
 
-            --out dist
-          # before-script-linux: |
-          #   apt-get update -y
-          #   dpkg --add-architecture aarch64
-          #   apt-get install -y libgssapi-krb5-2 libkrb5-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+      - name: Build wheel in manylinux AArch64 Docker container
+        run: |
+          docker run --rm -v $(pwd):/io quay.io/pypa/manylinux_2_24_aarch64 /bin/bash -c "
+          yum install -y libgssapi-krb5-devel krb5-devel openssl-devel
+          /opt/python/cp${{ matrix.python-version//./}}-cp${{ matrix.python-version//./}}m/bin/python -m pip install maturin
+          maturin build --manifest-path connectorx-python/Cargo.toml --release --target aarch64-unknown-linux-gnu
+          cp target/aarch64-unknown-linux-gnu/release/*.whl /io/dist/
+          "
+          
+      # - name: Build wheel
+      #   uses: PyO3/maturin-action@v1
+      #   with:
+      #     command: build
+      #     manylinux: 2_24
+      #     target: aarch64-unknown-linux-gnu
+      #     args: >
+      #       -i python${{ matrix.python-version }}
+      #       --manifest-path connectorx-python/Cargo.toml
+      #       --features integrated-auth-gssapi
+      #       --out dist
+      #     before-script-linux: |
+      #       apt-get update -y
+      #       dpkg --add-architecture aarch64
+      #       apt-get install -y libgssapi-krb5-2 libkrb5-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
   verify:
     runs-on: ubuntu-latest

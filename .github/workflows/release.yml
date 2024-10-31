@@ -39,6 +39,8 @@ jobs:
             apt-get update -y
             apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib libgssapi-krb5-2
 
+            ls -la /usr/aarch64-unknown-linux-gnu/bin
+
   verify:
     runs-on: ubuntu-latest
     needs: [linux-aarch]

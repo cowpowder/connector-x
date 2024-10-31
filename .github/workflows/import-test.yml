@@ -2,15 +2,6 @@ name: import-test
 
 on:
   workflow_dispatch:
-    inputs:
-      indexUrl:
-        description: "Index Url"
-        required: true
-        default: "https://test.pypi.org/simple/"
-      version:
-        description: "version"
-        required: false
-        default: ""
 
 jobs:
   check:

@@ -37,9 +37,7 @@ jobs:
             --out dist
           before-script-linux: |
             apt-get update -y
-            apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib libgssapi-krb5-2
-
-            ls -la /usr/aarch64-unknown-linux-gnu/bin
+            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libgssapi-krb5-2:aarch64 libkrb5-dev:aarch64
 
   verify:
     runs-on: ubuntu-latest

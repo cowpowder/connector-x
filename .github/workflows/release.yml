@@ -56,6 +56,8 @@ jobs:
               apt-get update -y
               apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib libgssapi-krb5-2
 
+              ldconfig -p | grep gssapi
+              export LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH
         env:
           SQLITE3_STATIC: 1
 

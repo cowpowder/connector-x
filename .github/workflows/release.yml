@@ -39,6 +39,7 @@ jobs:
         with:
           manylinux: 2_28
           target: aarch64
+          container: 
           args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
           before-script-linux: |
               apt-get update -y
@@ -54,6 +55,7 @@ jobs:
         with:
           manylinux: 2_28
           target: aarch64
+          container: quay.io/pypa/manylinux_2_28_aarch64
           args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
           before-script-linux: |
               apt-get update -y

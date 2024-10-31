@@ -118,16 +118,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: setup Poetry
-        run: |
-          python --version
-          which python
-          pip install poetry
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          ls -la $HOME
-          ls -la $HOME/.local
-
-          poetry --version
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.4
+          virtualenvs-create: true
+          virtualenvs-in-project: false
+          virtualenvs-path: ~/.venv
+          installer-parallel: true
 
       - name: Install tools
         run: |

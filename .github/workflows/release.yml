@@ -120,6 +120,8 @@ jobs:
 
       - name: setup Poetry
         run: |
+          python --version
+          which python
           pip install poetry
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           ls -la $HOME

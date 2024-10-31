@@ -35,7 +35,7 @@ jobs:
             --manifest-path connectorx-python/Cargo.toml
             --features integrated-auth-gssapi
             --out dist
-          manylinux: aarch64
+          manylinux: auto
 
   verify:
     runs-on: ubuntu-latest

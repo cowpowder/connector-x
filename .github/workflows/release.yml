@@ -32,8 +32,9 @@ jobs:
           docker pull quay.io/pypa/manylinux_2_24_aarch64
 
       - name: Prepare Python version without dots
-        id: prep_python_version
-        run: echo "PYTHON_VERSION_NO_DOTS=${{ matrix.python-version | replace('.', '') }}" >> $GITHUB_ENV
+        run: |
+          PYTHON_VERSION_NO_DOTS=$(echo "${{ matrix.python-version }}" | tr -d '.')
+          echo "PYTHON_VERSION_NO_DOTS=$PYTHON_VERSION_NO_DOTS" >> $GITHUB_ENV
 
       - name: Build wheel in manylinux AArch64 Docker container
         run: |

@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
     strategy:
-      matrix:
+      matrix:Í
         python-version: [[38, "3.8"], [39, "3.9"], [310, "3.10"], [311, "3.11"]]
     steps:
       - uses: actions/checkout@v2

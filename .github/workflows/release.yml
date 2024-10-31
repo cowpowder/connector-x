@@ -6,6 +6,7 @@ on:
 jobs:
   linux-aarch:
     runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux2014_aarch64
     strategy:
       matrix:
         python-version: ["3.10", "3.11"]
@@ -30,11 +31,6 @@ jobs:
       # Setup QEMU for cross-compilation
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
-
-      # Use the aarch64 manylinux container
-      - name: Use manylinux aarch64 container
-        container: quay.io/pypa/manylinux2014_aarch64
-        run: echo "Running in aarch64 container"
 
       # Install system dependencies for aarch64
       - name: Install system dependencies

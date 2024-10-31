@@ -4,28 +4,25 @@ on:
   push:
 
 jobs:
-  linux-aarch:
+  linux-aarch-create-sdist:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.10"]
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '${{ matrix.python-version }}'
+          python-version: ${{ matrix.python-version }}
 
-      - uses: actions-rs/toolchain@v1
+      # Avoid potential out-of-memory errors
+      - name: Set swap space for Linux
+        uses: pierotofy/set-swap-space@master
         with:
-          toolchain: stable
-          components: rustfmt
-          target: aarch64-unknown-linux-gnu
-          default: true
-          
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-  
+          swap-size-gb: 10
+    
       - uses: extractions/setup-just@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,38 +32,60 @@ jobs:
       - name: Setup project
         run: |
           just bootstrap-python
-      - uses: PyO3/maturin-action@v1
+    
+      - name: Create source distribution
+        uses: PyO3/maturin-action@v1
         with:
-          manylinux: 2_24
-          target: aarch64
-          args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
-          before-script-linux: |
-              apt-get update -y
-              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
-        env:
-          SQLITE3_STATIC: 1
+          command: sdist
+          args: >
+            --manifest-path connectorx-python/Cargo.toml
+            --out dist
 
-      - name: Copy j4rs dependencies into dist
+      - name: Test sdist
         run: |
-          cp -rf connectorx-python/target/release/jassets connectorx-python/connectorx/dependencies
-      # rebuild the wheel to incorporate j4rs dependencies
-      - uses: PyO3/maturin-action@v1
-        with:
-          manylinux: 2_24
-          target: aarch64
-          args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
-          before-script-linux: |
-              apt-get update -y
-              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
-        env:
-          SQLITE3_STATIC: 1
-          LIBRARY_PATH: /usr/lib/aarch64-linux-gnu:$LIBRARY_PATH
+          pip install --force-reinstall --verbose dist/*.tar.gz
+          python -c 'import connectorx'
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
         with:
-          name: "ubuntu-arm-latest-${{ matrix.python-version }}"
-          path: connectorx-python/target/wheels/*.whl
-  
+          name: sdist-connectorx
+          path: dist/*.tar.gz
+
+  build-wheels:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: False
+      matrix:
+        python-version: ["3.10"]
+        os: [ubuntu-latest]
+        architecture: [aarch64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set swap space for Linux
+        if: matrix.os == 'ubuntu-latest'
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 10
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build wheel
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          target: aarch64-unknown-linux-gnu
+          args: >
+            --profile dist-release
+            --manifest-path connectorx-python/Cargo.toml
+            --out dist
+          manylinux: ${{ matrix.architecture == 'aarch64' && '2_24' || 'auto' }}
+
   verify:
     runs-on: ubuntu-latest
     needs: [linux-aarch]

@@ -31,11 +31,10 @@ jobs:
           target: aarch64-unknown-linux-gnu
           args: >
             -i python${{ matrix.python-version }}
-            --profile dist-release
             --manifest-path connectorx-python/Cargo.toml
             --features integrated-auth-gssapi
             --out dist
-          manylinux: auto
+          manylinux: 2_24
 
   verify:
     runs-on: ubuntu-latest

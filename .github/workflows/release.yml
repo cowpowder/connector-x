@@ -70,20 +70,7 @@ jobs:
 
         env:
           SQLITE3_STATIC: 1
-
-      # - uses: PyO3/maturin-action@v1
-      #   with:
-      #     manylinux: 2_28
-      #     target: aarch64
-      #     args: -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
-      #     before-script-linux: |
-      #       apt-get update -y
-
-      #       apt-get install -y libssl-dev openssl pkg-config libkrb5-dev libgssapi-krb5-2 gcc-aarch64-linux-gnu
-      #       dpkg --add-architecture aarch64
           
-      #   env:
-      #     SQLITE3_STATIC: 1
 
       - name: Copy j4rs dependencies into dist
         run: |

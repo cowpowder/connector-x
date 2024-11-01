@@ -24,7 +24,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker buildx create --use
-          docker buildx build --platform linux/arm64  -f Dockerfile.aarch64 -t connectorx-python-aarch64:latest .
+          docker buildx build --platform linux/arm64 --build-arg PYTHON_VERSION=3.9 -f Dockerfile.aarch64 -t connectorx-python-aarch64:latest .
 
       - name: Run Maturin Build
         run: |

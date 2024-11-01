@@ -1,44 +1,31 @@
-# First stage: Install dependencies
+# Set the default Python version
+ARG PYTHON_VERSION=3.9
+
 FROM --platform=linux/arm64 debian:bullseye AS build-env
 
-# Set up the environment for ARM64
 RUN apt-get update && apt-get install -y \
     libkrb5-dev \
     openssl \
     pkg-config \
     libssl-dev \
-    python3 \
-    python3-pip \
+    python${PYTHON_VERSION} \
+    python${PYTHON_VERSION}-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip3 install poetry
-
-# Set the working directory
+RUN pip install poetry
 WORKDIR /app
 
-# Copy project files
 COPY connectorx-python/pyproject.toml .
 COPY connectorx-python/poetry.lock .
 COPY connectorx-python/Cargo.toml connectorx-python/
 
-# Install dependencies using Poetry
 RUN poetry install
-
-# Install Maturin
 RUN pip install maturin
 
-# Second stage: Use tonistiigi/binfmt for building
 FROM tonistiigi/binfmt:latest
 
-# Set the working directory
 WORKDIR /app
 
-# Copy from the build stage
 COPY --from=build-env /app /app
 
-# Check the architecture using /proc/cpuinfo
-RUN cat /proc/cpuinfo
-
-# Build the project with Maturin
-CMD ["maturin", "build", "-m", "connectorx-python/Cargo.toml", "-i", "python3", "--release", "--features", "integrated-auth-gssapi"]
+CMD ["maturin", "build", "-m", "connectorx-python/Cargo.toml", "-i", "python${PYTHON_VERSION}", "--release", "--features", "integrated-auth-gssapi"]

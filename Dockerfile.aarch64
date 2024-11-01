@@ -1,7 +1,7 @@
 # Use the QEMU image for ARM64 architecture
 FROM tonistiigi/binfmt:latest
 
-RUN lscpu
+RUN cat /proc/cpuinfo
 
 # Set up the environment for the ARM64 architecture
 RUN apt-get update && apt-get install -y \

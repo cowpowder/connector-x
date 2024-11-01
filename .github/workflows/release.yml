@@ -31,6 +31,7 @@ jobs:
           docker build --output type=local,dest=./wheels \
             --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
             --build-arg CONNECTORX_VERSION=0.3.4-alpha.8 \
+            -f Dockerfile.aarch64 \
             -t connectorx-arm64 .
 
       - name: Run Maturin Build

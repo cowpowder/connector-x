@@ -29,7 +29,8 @@ jobs:
       - name: mkdir
         run: |
           mkdir -p wheels
-          docker run --privileged --rm tonistiigi/binfmt --install all
+          docker run --privileged --rm tonistiigi/binfmt --install all\
+          qemu-aarch64-static /bin/bash
           uname -m
   
       - name: docker build 2

@@ -40,31 +40,26 @@ jobs:
             -t connectorx-python-aarch64:latest \
             --load .
 
+      - name: Run Docker container
+        id: run_container
+        run: |
+          docker run --name connectorx-container connectorx-python-aarch64:latest &
+          sleep 10  # Wait for the container to start
 
-      # - name: docker build 2
-      #   run: |
-      #     docker build --output type=local,dest=./wheels \
-      #       --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
-      #       --build-arg CONNECTORX_VERSION=0.3.4-alpha.8 \
-      #       -f Dockerfile.aarch64 \
-      #       -t connectorx-arm64 .
-
-      # - name: Run Maturin Build
-      #   run: |
-      #     mkdir -p output
-      #     docker run --rm -v ${{ github.workspace }}/output:/app/output connectorx-python-aarch64:latest \
-      #       maturin build -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi --out output
+      - name: Copy .whl files from container
+        run: |
+          mkdir wheels
+          docker cp connectorx-container:/wheels/. wheels/
 
       - name: Checky check
         run: |
-          ls -ltRa output
+          ls -ltRa wheels
       
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: built-artifacts
-          path: target/wheels/*.whl  # Adjust the path to where Maturin outputs the wheel files
-
+          path: wheels/*.whl  # Adjust the path to where Maturin outputs the wheel files
 
       # - name: Build wheel
       #   uses: PyO3/maturin-action@v1

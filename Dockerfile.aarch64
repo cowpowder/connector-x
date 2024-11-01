@@ -2,7 +2,7 @@
 FROM tonistiigi/binfmt:latest
 
 # Set up the environment for the ARM64 architecture
-RUN apt-get update && apt-get install -y \
+RUN yum install -y \
     libgssapi-krb5-dev \
     krb5-devel \
     libssl-dev \

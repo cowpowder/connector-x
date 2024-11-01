@@ -26,6 +26,11 @@ jobs:
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v2
 
+
+      - name: check path
+        run: |
+          ls -ltRa .
+          
       - name: Build Docker Image
         run: |
           docker buildx create --use
@@ -35,9 +40,6 @@ jobs:
             -t connectorx-python-aarch64:latest \
             --load .
 
-      - name: check path
-        run: |
-          ls -ltRa .
 
       # - name: docker build 2
       #   run: |

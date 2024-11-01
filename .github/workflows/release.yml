@@ -1,54 +1,40 @@
-name: release
+name: Build ARM64 Docker Image with Dependencies
 
-on:
+on: 
   push:
+    branches:
+      - main
 
 jobs:
-  linux-aarch:
+  build:
     runs-on: ubuntu-latest
+
     strategy:
-      fail-fast: False
       matrix:
-        python-version: ["3.10"]
+        python-version: [3.8, 3.9, 3.10, 3.11] 
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set swap space for Linux
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 10
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          
-      - name: Setup QEMU
+      - name: Check out code
+        uses: actions/checkout@v2
+      
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-
-      - name: Pull manylinux AArch64 Docker image
+      
+      - name: Build Docker Image
         run: |
-          docker pull quay.io/pypa/manylinux_2_24_aarch64
+          docker buildx create --use
+          docker buildx build --platform linux/arm64  -f path/to/Dockerfile.aarch64 -t connectorx-python-aarch64:latest .
 
-      - name: Prepare Python version without dots
+      - name: Run Maturin Build
         run: |
-          PYTHON_VERSION_NO_DOTS=$(echo "${{ matrix.python-version }}" | tr -d '.')
-          echo "PYTHON_VERSION_NO_DOTS=$PYTHON_VERSION_NO_DOTS" >> $GITHUB_ENV
+          docker run --rm connectorx-python-aarch64:latest \
+            maturin build -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi
 
-      - name: Activate manylinux AArch64 Docker container and install Python
-        run: |
-          docker run --rm -v $(pwd):/io quay.io/pypa/manylinux_2_24_aarch64 /bin/bash -c "
-          apt-get update
-          apt-get install software-properties-common
-          add-apt-repository ppa:deadsnakes/ppa
-          apt-get update
-          apt-get install python${{ matrix.python-version }}
-
-          pip install maturin
-          apt-get -y install libgssapi-krb5-devel krb5-devel openssl-devel
-          maturin build --manifest-path connectorx-python/Cargo.toml --release --target aarch64-unknown-linux-gnu && \
-          cp target/aarch64-unknown-linux-gnu/release/*.whl /io/dist/"
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-artifacts
+          path: target/wheels/*.whl  # Adjust the path to where Maturin outputs the wheel files
 
 
       # - name: Build wheel

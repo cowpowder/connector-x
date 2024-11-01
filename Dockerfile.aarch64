@@ -1,0 +1,35 @@
+# Use the QEMU image for ARM64 architecture
+FROM tonistiigi/binfmt:latest
+
+RUN lscpu
+
+# Set up the environment for the ARM64 architecture
+RUN apt-get update && apt-get install -y \
+    libgssapi-krb5-dev \
+    krb5-devel \
+    libssl-dev \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip3 install poetry
+
+# Set the working directory
+WORKDIR /app
+
+# Copy your project files (assuming you have a pyproject.toml)
+COPY pyproject.toml .
+COPY connectorx-python/Cargo.toml connectorx-python/
+
+# Install the dependencies using Poetry
+RUN poetry install
+
+# Install Maturin
+RUN pip install maturin
+
+# Copy the source code and build with Maturin
+COPY . .
+
+# Build the project with Maturin
+CMD ["maturin", "build", "-m", "connectorx-python/Cargo.toml", "-i", "python3", "--release", "--features", "integrated-auth-gssapi"]

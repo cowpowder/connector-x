@@ -29,9 +29,8 @@ jobs:
       - name: mkdir
         run: |
           mkdir -p wheels
-          docker pull arm64v8/python:3.10-bookworm
-          docker manifest inspect arm64v8/python:3.10-bookworm
-
+          docker run --privileged --rm tonistiigi/binfmt --install all
+          uname -m
   
       - name: docker build 2
         run: |

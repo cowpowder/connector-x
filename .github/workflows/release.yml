@@ -30,9 +30,9 @@ jobs:
         run: |
           docker buildx create --use
           docker buildx build --platform linux/arm64 
-            --build-arg PYTHON_VERSION=${{ matrix.python-version }} 
-            -f Dockerfile.aarch64 
-            -t connectorx-python-aarch64:latest 
+            --build-arg PYTHON_VERSION=${{ matrix.python-version }}  \
+            -f Dockerfile.aarch64 \
+            -t connectorx-python-aarch64:latest \
             --load .
   
       # - name: docker build 2

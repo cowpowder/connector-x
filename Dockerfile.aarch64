@@ -1,5 +1,7 @@
 # Set the default Python version
-ARG PYTHON_VERSION=3.9
+ARG PYTHON_VERSION
+
+RUN echo "Building with Python version: ${PYTHON_VERSION}"
 
 FROM --platform=linux/arm64 debian:bullseye AS build-env
 

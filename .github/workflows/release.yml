@@ -34,7 +34,11 @@ jobs:
             -f Dockerfile.aarch64 \
             -t connectorx-python-aarch64:latest \
             --load .
-  
+
+      - name: check path
+        run: |
+          ls -ltRa .
+
       # - name: docker build 2
       #   run: |
       #     docker build --output type=local,dest=./wheels \

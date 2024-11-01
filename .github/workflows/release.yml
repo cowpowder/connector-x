@@ -22,26 +22,26 @@ jobs:
         uses: docker/setup-qemu-action@v3
         with:
           platforms: linux/arm64
-      
-      # - name: Build Docker Image
-      #   run: |
-      #     docker buildx create --use
-      #     docker buildx build --platform linux/arm64 --build-arg PYTHON_VERSION=${{ matrix.python-version }} -f Dockerfile.aarch64 -t connectorx-python-aarch64:latest .
 
-      - name: mkdir
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker Image
         run: |
-          mkdir -p wheels
-          docker run --privileged --rm tonistiigi/binfmt --install all
-          qemu-aarch64-static /bin/bash
-          uname -m
+          docker buildx create --use
+          docker buildx build --platform linux/arm64 
+            --build-arg PYTHON_VERSION=${{ matrix.python-version }} 
+            -f Dockerfile.aarch64 
+            -t connectorx-python-aarch64:latest 
+            --load .
   
-      - name: docker build 2
-        run: |
-          docker build --output type=local,dest=./wheels \
-            --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
-            --build-arg CONNECTORX_VERSION=0.3.4-alpha.8 \
-            -f Dockerfile.aarch64 \
-            -t connectorx-arm64 .
+      # - name: docker build 2
+      #   run: |
+      #     docker build --output type=local,dest=./wheels \
+      #       --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
+      #       --build-arg CONNECTORX_VERSION=0.3.4-alpha.8 \
+      #       -f Dockerfile.aarch64 \
+      #       -t connectorx-arm64 .
 
       - name: Run Maturin Build
         run: |
@@ -51,7 +51,7 @@ jobs:
 
       - name: Checky check
         run: |
-          ls -ltRa
+          ls -ltRa output
       
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4

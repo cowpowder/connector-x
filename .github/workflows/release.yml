@@ -21,10 +21,17 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       
-      - name: Build Docker Image
+      # - name: Build Docker Image
+      #   run: |
+      #     docker buildx create --use
+      #     docker buildx build --platform linux/arm64 --build-arg PYTHON_VERSION=${{ matrix.python-version }} -f Dockerfile.aarch64 -t connectorx-python-aarch64:latest .
+
+      - name: docker build 2
         run: |
-          docker buildx create --use
-          docker buildx build --platform linux/arm64 --build-arg PYTHON_VERSION=${{ matrix.python-version }} -f Dockerfile.aarch64 -t connectorx-python-aarch64:latest .
+          docker build --output type=local,dest=./wheels \
+            --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
+            --build-arg CONNECTORX_VERSION=0.3.4-alpha.8 \
+            -t connectorx-arm64 .
 
       - name: Run Maturin Build
         run: |

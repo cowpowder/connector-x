@@ -1,33 +1,53 @@
-# Set the default Python version
+ARG PYTHON_VERSION=3.9.19
+ARG CONNECTORX_VERSION=0.3.3
+ARG RUST_VERSION=1.78.0
+
+FROM arm64v8/python:${PYTHON_VERSION}-bookworm AS builder
+
 ARG PYTHON_VERSION
+ARG CONNECTORX_VERSION
+ARG RUST_VERSION
 
-RUN echo "Building with Python version: ${PYTHON_VERSION}"
-
-FROM --platform=linux/arm64 debian:bullseye AS build-env
-
-RUN apt-get update && apt-get install -y \
+# Install dependencies
+RUN apt-get update && apt-get install -y --fix-missing \
+    libmariadb-dev-compat \
+    libmariadb-dev \
+    freetds-dev \
+    libpq-dev \
+    wget \
+    curl \
+    build-essential \
     libkrb5-dev \
-    openssl \
-    pkg-config \
-    libssl-dev \
-    python${PYTHON_VERSION} \
-    python${PYTHON_VERSION}-pip \
-    && rm -rf /var/lib/apt/lists/*
+    clang \
+    git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pip install poetry
-WORKDIR /app
+# Create workspace directory
+RUN mkdir /workspace
+WORKDIR /workspace
 
-COPY connectorx-python/pyproject.toml .
-COPY connectorx-python/poetry.lock .
-COPY connectorx-python/Cargo.toml connectorx-python/
+# Install rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs --insecure | bash -s -- -y --default-toolchain ${RUST_VERSION}
+ENV PATH="/root/.cargo/bin:/usr/local/bin:$PATH"
+# Install Python from source
+# RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
+#     tar -xvf Python-${PYTHON_VERSION}.tgz && \
+#     cd Python-${PYTHON_VERSION} && \
+#     ./configure --enable-optimizations && \
+#     make install && \
+#     cd .. && rm -rf Python-${PYTHON_VERSION}*
 
-RUN poetry install
-RUN pip install maturin
+# Install poetry and maturin
+# RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip 
+RUN pip install --no-cache-dir poetry maturin[patchelf]
 
-FROM tonistiigi/binfmt:latest
+# Clone the connectorx repo at the specified tag
+RUN git clone --depth 1 --branch v${CONNECTORX_VERSION} https://github.com/sfu-db/connector-x.git
+WORKDIR /workspace/connector-x
 
-WORKDIR /app
+# Build the python wheel through maturin
+RUN maturin build -m connectorx-python/Cargo.toml -i python3 --release
 
-COPY --from=build-env /app /app
-
-CMD ["maturin", "build", "-m", "connectorx-python/Cargo.toml", "-i", "python${PYTHON_VERSION}", "--release", "--features", "integrated-auth-gssapi"]
+# Copy the built wheel to the output directory
+FROM scratch AS output
+COPY --from=builder /workspace/connector-x/connectorx-python/target/wheels /

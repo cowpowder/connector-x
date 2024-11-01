@@ -39,8 +39,9 @@ jobs:
       - name: Build wheel in manylinux AArch64 Docker container
         run: |
           docker run --rm -v $(pwd):/io quay.io/pypa/manylinux_2_24_aarch64 /bin/bash -c "
-          yum install -y libgssapi-krb5-devel krb5-devel openssl-devel
-          /opt/python/cp${{ env.PYTHON_VERSION_NO_DOTS }}-cp${{ env.PYTHON_VERSION_NO_DOTS }}m/bin/python -m pip install maturin
+          apt-get -y update
+          apt-get -y libgssapi-krb5-devel krb5-devel openssl-devel
+          pip install maturin
           maturin build --manifest-path connectorx-python/Cargo.toml --release --target aarch64-unknown-linux-gnu
           cp target/aarch64-unknown-linux-gnu/release/*.whl /io/dist/
           "

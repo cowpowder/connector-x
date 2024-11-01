@@ -3,7 +3,10 @@ FROM --platform=linux/arm64 debian:bullseye AS build-env
 
 # Set up the environment for ARM64
 RUN apt-get update && apt-get install -y \
-    libgssapi-krb5-dev \
+    libkrb5-dev \
+    openssl \
+    gcc-multilib \
+    pkg-config \
     krb5-devel \
     libssl-dev \
     python3 \

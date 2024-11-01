@@ -96,6 +96,7 @@ jobs:
           name: "${{ matrix.os }}-${{ matrix.python-version }}"
 
       - run: |
+          ls -ltRa
           pip install *.whl
           python -c "import connectorx"
 

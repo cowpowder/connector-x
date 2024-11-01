@@ -39,9 +39,12 @@ jobs:
       - name: Activate manylinux AArch64 Docker container and install Python
         run: |
           docker run --rm -v $(pwd):/io quay.io/pypa/manylinux_2_24_aarch64 /bin/bash -c "
-          apt-get -y install python$PYTHON_VERSION_NO_DOTS python$PYTHON_VERSION_NO_DOTS-dev python$PYTHON_VERSION_NO_DOTS-distutils python3-pip && \
-          python$PYTHON_VERSION_NO_DOTS -m ensurepip --upgrade
-          python3 -m ensurepip --upgrade
+          sudo apt-get update
+          sudo apt-get install software-properties-common
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt-get update
+          sudo apt-get install python${{ matrix.python-version }}
+
           pip install maturin
           apt-get -y install libgssapi-krb5-devel krb5-devel openssl-devel
           maturin build --manifest-path connectorx-python/Cargo.toml --release --target aarch64-unknown-linux-gnu && \

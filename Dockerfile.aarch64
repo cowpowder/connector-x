@@ -19,7 +19,8 @@ RUN pip3 install poetry
 WORKDIR /app
 
 # Copy your project files (assuming you have a pyproject.toml)
-COPY pyproject.toml .
+COPY connectorx-python/pyproject.toml .
+COPY connectorx-python/poetry.lock .
 COPY connectorx-python/Cargo.toml connectorx-python/
 
 # Install the dependencies using Poetry

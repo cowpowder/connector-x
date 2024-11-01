@@ -26,6 +26,13 @@ jobs:
       #     docker buildx create --use
       #     docker buildx build --platform linux/arm64 --build-arg PYTHON_VERSION=${{ matrix.python-version }} -f Dockerfile.aarch64 -t connectorx-python-aarch64:latest .
 
+      - name: mkdir
+        run: |
+          mkdir -p wheels
+          docker pull arm64v8/python:3.10-bookworm
+          docker manifest inspect arm64v8/python:3.10-bookworm
+
+  
       - name: docker build 2
         run: |
           docker build --output type=local,dest=./wheels \

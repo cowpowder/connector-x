@@ -30,7 +30,7 @@ jobs:
       - name: check path
         run: |
           ls -ltRa .
-          
+
       - name: Build Docker Image
         run: |
           docker buildx create --use
@@ -49,11 +49,11 @@ jobs:
       #       -f Dockerfile.aarch64 \
       #       -t connectorx-arm64 .
 
-      - name: Run Maturin Build
-        run: |
-          mkdir -p output
-          docker run --rm -v ${{ github.workspace }}/output:/app/output connectorx-python-aarch64:latest \
-            maturin build -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi --out output
+      # - name: Run Maturin Build
+      #   run: |
+      #     mkdir -p output
+      #     docker run --rm -v ${{ github.workspace }}/output:/app/output connectorx-python-aarch64:latest \
+      #       maturin build -m connectorx-python/Cargo.toml -i python${{ matrix.python-version }} --release --features integrated-auth-gssapi --out output
 
       - name: Checky check
         run: |

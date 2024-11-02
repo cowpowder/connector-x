@@ -8,6 +8,8 @@ ARG PYTHON_VERSION
 ARG CONNECTORX_VERSION
 ARG RUST_VERSION
 
+RUN ls -ltRa
+
 # Install dependencies
 RUN apt-get update && apt-get install -y --fix-missing \
     libmariadb-dev-compat \
@@ -23,7 +25,7 @@ RUN apt-get update && apt-get install -y --fix-missing \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create workspace directory
-RUN ls -ltRa
+
 RUN mkdir /workspace
 WORKDIR /workspace
 

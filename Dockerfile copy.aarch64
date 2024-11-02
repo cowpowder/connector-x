@@ -3,6 +3,9 @@ ARG PYTHON_VERSION
 
 RUN echo "Building with Python version: ${PYTHON_VERSION}"
 
+RUN ls -la
+RUN ls -la connectorx-python
+
 FROM --platform=linux/arm64 debian:bullseye AS build-env
 
 RUN apt-get update && apt-get install -y \

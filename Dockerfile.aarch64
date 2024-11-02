@@ -8,8 +8,6 @@ ARG PYTHON_VERSION
 ARG CONNECTORX_VERSION
 ARG RUST_VERSION
 
-RUN ls -ltRa
-
 # Install dependencies
 RUN apt-get update && apt-get install -y --fix-missing \
     libmariadb-dev-compat \
@@ -29,16 +27,13 @@ RUN apt-get update && apt-get install -y --fix-missing \
 RUN mkdir /workspace
 WORKDIR /workspace
 
+COPY connectorx-python /workspace
+RUN ls -ltRa /workspace
+
+
 # Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs --insecure | bash -s -- -y --default-toolchain ${RUST_VERSION}
 ENV PATH="/root/.cargo/bin:/usr/local/bin:$PATH"
-# Install Python from source
-# RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
-#     tar -xvf Python-${PYTHON_VERSION}.tgz && \
-#     cd Python-${PYTHON_VERSION} && \
-#     ./configure --enable-optimizations && \
-#     make install && \
-#     cd .. && rm -rf Python-${PYTHON_VERSION}*
 
 # Install poetry and maturin
 # RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip 

@@ -28,7 +28,7 @@ RUN mkdir /workspace
 WORKDIR /workspace
 
 RUN mkdir /workspace/connector-x
-COPY * /workspace/connector-x/
+COPY . /workspace/connector-x/
 
 RUN ls -ltRa /workspace/connector-x
 

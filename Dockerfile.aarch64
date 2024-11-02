@@ -27,24 +27,28 @@ RUN apt-get update && apt-get install -y --fix-missing \
 RUN mkdir /workspace
 WORKDIR /workspace
 
-COPY connectorx-python /workspace
-RUN ls -ltRa /workspace
+RUN mkdir -p /workspace/connector-x
+COPY connectorx-python /workspace/connectorx-python
+COPY connectorx-cpp /workspace/connectorx-cpp
+COPY connectorx /workspace/connectorx
 
+RUN ls -ltRa /workspace/connector-x
 
 # Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs --insecure | bash -s -- -y --default-toolchain ${RUST_VERSION}
 ENV PATH="/root/.cargo/bin:/usr/local/bin:$PATH"
 
 # Install poetry and maturin
-# RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip 
 RUN pip install --no-cache-dir poetry maturin[patchelf]
 
-# Clone the connectorx repo at the specified tag
-RUN git clone --depth 1 --branch v${CONNECTORX_VERSION} https://github.com/sfu-db/connector-x.git
+# # Clone the connectorx repo at the specified tag
+# RUN git clone --depth 1 --branch v${CONNECTORX_VERSION} https://github.com/sfu-db/connector-x.git
 WORKDIR /workspace/connector-x
 
 # Build the python wheel through maturin
 RUN maturin build -m connectorx-python/Cargo.toml -i python3 --release
+
+RUN ls -la /workspace/connector-x/connectorx-python/target/wheels
 
 # Copy the built wheel to the output directory
 FROM scratch AS output

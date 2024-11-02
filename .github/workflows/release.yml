@@ -35,50 +35,33 @@ jobs:
             -t connectorx-python-aarch64:latest \
             --load .
 
-      - name: Run Docker container
+      - name: Extract wheel
         run: |
-          docker create --name connectorx-container connectorx-python-aarch64:latest
+          docker create --name temp connectorx-python-aarch64:latest
           sleep 10
-    
-      - name: Copy .whl out from container
-        run: |
-          mkdir wheels
-          docker cp connectorx-container:/workspace/connector-x/connectorx-python/target/wheels/. wheels/
 
-          ls -la wheels
+          WHL_FILENAME=$(docker exec temp ls /workspace/connector-x/connectorx-python/target/wheels)
+          docker cp temp:/workspace/connector-x/connectorx-python/target/wheels/$WHL_FILENAME .
+
+          ls -la .
 
       - name: Remove container
         run: |
-          docker rm connectorx-container
+          docker stop temp
+          docker rm temp
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: built-artifacts
-          path: wheels/*.whl  # Adjust the path to where Maturin outputs the wheel files
-
-      # - name: Build wheel
-      #   uses: PyO3/maturin-action@v1
-      #   with:
-      #     command: build
-      #     manylinux: 2_24
-      #     target: aarch64-unknown-linux-gnu
-      #     args: >
-      #       -i python${{ matrix.python-version }}
-      #       --manifest-path connectorx-python/Cargo.toml
-      #       --features integrated-auth-gssapi
-      #       --out dist
-      #     before-script-linux: |
-      #       apt-get update -y
-      #       dpkg --add-architecture aarch64
-      #       apt-get install -y libgssapi-krb5-2 libkrb5-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          path: ./*.whl 
 
   verify:
     runs-on: ubuntu-latest
     needs: [linux-aarch]
     strategy:
       matrix:
-        python-version: ["3.10"]
+        python-version: ["3.10", "3.11"] 
 
     steps:
       - uses: actions/checkout@v4

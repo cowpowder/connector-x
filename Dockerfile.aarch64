@@ -23,7 +23,6 @@ RUN apt-get update && apt-get install -y --fix-missing \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create workspace directory
-
 RUN mkdir /workspace
 WORKDIR /workspace
 
@@ -39,8 +38,6 @@ ENV PATH="/root/.cargo/bin:/usr/local/bin:$PATH"
 # Install poetry and maturin
 RUN pip install --no-cache-dir poetry maturin[patchelf]
 
-# # Clone the connectorx repo at the specified tag
-# RUN git clone --depth 1 --branch v${CONNECTORX_VERSION} https://github.com/sfu-db/connector-x.git
 WORKDIR /workspace/connector-x
 
 # Build the python wheel through maturin
@@ -48,6 +45,4 @@ RUN maturin build -m connectorx-python/Cargo.toml -i python3 --release
 
 RUN ls -la /workspace/connector-x/connectorx-python/target/wheels
 
-# Copy the built wheel to the output directory
-FROM scratch AS output
-COPY --from=builder /workspace/connector-x/connectorx-python/target/wheels /
+CMD ["sleep","3600"]

@@ -43,28 +43,30 @@ jobs:
       - name: Run Docker container
         id: run_container
         run: |
-          docker run -d --name connectorx-container connectorx-python-aarch64:latest
-          sleep 10
+          ls -la /
 
-      - name: Copy .whl files from container
-        run: |
-          mkdir wheels
-          docker cp connectorx-container:/workspace/connector-x/connectorx-python/target/wheels/. wheels/
+      #     docker run -d --name connectorx-container connectorx-python-aarch64:latest
+      #     sleep 10
 
-      - name: Checky check
-        run: |
-          ls -ltRa wheels
+      # - name: Copy .whl files from container
+      #   run: |
+      #     mkdir wheels
+      #     docker cp connectorx-container:/workspace/connector-x/connectorx-python/target/wheels/. wheels/
 
-      - name: Stop and remove Docker container
-        run: |
-          docker stop connectorx-container
-          docker rm connectorx-container
+      # - name: Checky check
+      #   run: |
+      #     ls -ltRa wheels
+
+      # - name: Stop and remove Docker container
+      #   run: |
+      #     docker stop connectorx-container
+      #     docker rm connectorx-container
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: built-artifacts
-          path: wheels/*.whl  # Adjust the path to where Maturin outputs the wheel files
+          path: /*.whl  # Adjust the path to where Maturin outputs the wheel files
 
       # - name: Build wheel
       #   uses: PyO3/maturin-action@v1

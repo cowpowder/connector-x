@@ -43,18 +43,23 @@ jobs:
       - name: Run Docker container
         id: run_container
         run: |
-          docker run --name connectorx-container connectorx-python-aarch64:latest &
-          sleep 10  # Wait for the container to start
+          docker run -d --name connectorx-container connectorx-python-aarch64:latest
+          sleep 10
 
       - name: Copy .whl files from container
         run: |
           mkdir wheels
-          docker cp connectorx-container:/wheels/. wheels/
+          docker cp connectorx-container:/workspace/connector-x/connectorx-python/target/wheels/. wheels/
 
       - name: Checky check
         run: |
           ls -ltRa wheels
-      
+
+      - name: Stop and remove Docker container
+        run: |
+          docker stop connectorx-container
+          docker rm connectorx-container
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:

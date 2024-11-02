@@ -27,11 +27,12 @@ RUN apt-get update && apt-get install -y --fix-missing \
 RUN mkdir /workspace
 WORKDIR /workspace
 
-COPY connectorx-python /workspace/connectorx-python
-COPY connectorx-cpp /workspace/connectorx-cpp
-COPY connectorx /workspace/connectorx
+RUN mkdir /workspace/connector-x
+COPY connectorx-python /workspace/connector-x/connectorx-python
+COPY connectorx-cpp /workspace/connector-x/connectorx-cpp
+COPY connectorx /workspace/connector-x/connectorx
 
-RUN ls -ltRa /workspace
+RUN ls -ltRa /workspace/connector-x
 
 # Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs --insecure | bash -s -- -y --default-toolchain ${RUST_VERSION}

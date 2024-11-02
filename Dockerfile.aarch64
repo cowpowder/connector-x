@@ -28,9 +28,7 @@ RUN mkdir /workspace
 WORKDIR /workspace
 
 RUN mkdir /workspace/connector-x
-COPY connectorx-python /workspace/connector-x/connectorx-python
-COPY connectorx-cpp /workspace/connector-x/connectorx-cpp
-COPY connectorx /workspace/connector-x/connectorx
+COPY * /workspace/connector-x/
 
 RUN ls -ltRa /workspace/connector-x
 

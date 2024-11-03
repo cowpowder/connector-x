@@ -1,21 +1,29 @@
 name: aarch64-test
 
 on:
-  workflow_dispatch:
+  push:
 
 jobs:
  linux-aarch:
     runs-on: ubuntu-latest
-    container: ghcr.io/rust-cross/manylinux_2_24-cross:aarch64
     strategy:
       matrix:
-        python-version: [[38, "3.8"], [39, "3.9"], [310, "3.10"], [311, "3.11"]]
+      matrix:
+        os: [ubuntu-latest]
+        architecture: [aarch64]
+          
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Set python version
-        run: |
-          echo "/opt/python/cp${{ matrix.python-version[0] }}-cp${{ matrix.python-version[0] }}/bin" >> $GITHUB_PATH
+      - name: Set swap space for Linux
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 10
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -24,28 +32,19 @@ jobs:
           target: aarch64-unknown-linux-gnu
           default: true
 
-      - uses: extractions/setup-just@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: Gr1N/setup-poetry@v9
-
-      - name: Install tools
+      - name: Set jemalloc for aarch64 Linux
+        if: matrix.architecture == 'aarch64' && matrix.os == 'ubuntu-latest'
         run: |
-          yum install -y epel-release
-          yum install -y mysql-devel postgresql-devel freetds-devel krb5-libs clang-devel
+          echo "JEMALLOC_SYS_WITH_LG_PAGE=16" >> $GITHUB_ENV
 
-      - name: Setup project
-        run: |
-          just bootstrap-python
-
-      - uses: PyO3/maturin-action@v1
+      - name: Build wheel
+        uses: PyO3/maturin-action@v1
         with:
           manylinux: 2_24
-          target: aarch64
+          target: aarch64-unknown-linux-gnu
           rust-toolchain: 1.71.1
           command: build
-          args: -m connectorx-python/Cargo.toml --target aarch64-unknown-linux-gnu -i python --release --manylinux 2_28 --features integrated-auth-gssapi
+          args: -m connectorx-python/Cargo.toml -i python --release --features integrated-auth-gssapi
         env:
           SQLITE3_STATIC: 1
 
@@ -54,15 +53,18 @@ jobs:
           cp -rf connectorx-python/target/release/jassets connectorx-python/connectorx/dependencies
 
       # rebuild the wheel to incorporate j4rs dependencies
-      - uses: PyO3/maturin-action@v1
+      - name: Build wheel
+        uses: PyO3/maturin-action@v1
         with:
+          manylinux: 2_24
+          target: aarch64-unknown-linux-gnu
           rust-toolchain: 1.71.1
           command: build
-          args: -m connectorx-python/Cargo.toml --target aarch64-unknown-linux-gnu -i python --release --manylinux 2_28 --features integrated-auth-gssapi
+          args: -m connectorx-python/Cargo.toml -i python --release --features integrated-auth-gssapi
         env:
           SQLITE3_STATIC: 1
 
       - uses: actions/upload-artifact@v3
         with:
-          name: "aarch-${{ matrix.python-version[1] }}"
+          name: "aarch-test"
           path: connectorx-python/target/wheels/*.whl

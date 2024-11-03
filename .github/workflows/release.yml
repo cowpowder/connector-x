@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"] 
+        python-version: ["3.9", "3.10", "3.11", "3.12"] 
 
     steps:
       - name: Check out code
@@ -53,15 +53,15 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: built-artifacts
+          name: "manylinux-aarch64-${{ matrix.python-version }}"
           path: ./*.whl 
 
-  verify:
+  verify-aarch:
     runs-on: ubuntu-latest
     needs: [linux-aarch]
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"] 
+        python-version: ["3.9", "3.10", "3.11", "3.12"] 
 
     steps:
       - uses: actions/checkout@v4

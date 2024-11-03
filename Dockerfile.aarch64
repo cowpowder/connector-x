@@ -1,11 +1,9 @@
-ARG PYTHON_VERSION=3.9.19
-ARG CONNECTORX_VERSION=0.3.3
+ARG PYTHON_VERSION=3.9
 ARG RUST_VERSION=1.78.0
 
 FROM arm64v8/python:${PYTHON_VERSION}-bookworm AS builder
 
 ARG PYTHON_VERSION
-ARG CONNECTORX_VERSION
 ARG RUST_VERSION
 
 # Install dependencies
@@ -29,14 +27,12 @@ WORKDIR /workspace
 RUN mkdir /workspace/connector-x
 COPY . /workspace/connector-x/
 
-RUN ls -ltRa /workspace/connector-x
-
 # Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs --insecure | bash -s -- -y --default-toolchain ${RUST_VERSION}
 ENV PATH="/root/.cargo/bin:/usr/local/bin:$PATH"
 
 # Install poetry and maturin
-RUN pip install --no-cache-dir poetry maturin[patchelf]
+RUN pip3 install --no-cache-dir poetry maturin[patchelf]
 
 WORKDIR /workspace/connector-x
 

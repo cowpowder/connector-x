@@ -50,7 +50,6 @@ jobs:
           before-script-linux: |
             apt-get update -y
             apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib libcurl4-openssl-dev zlib1g-dev
-            dpkg -L libgssapi-dev
 
         env:
           SQLITE3_STATIC: 1

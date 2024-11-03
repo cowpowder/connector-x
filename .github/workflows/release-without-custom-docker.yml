@@ -43,7 +43,11 @@ jobs:
           target: aarch64-unknown-linux-gnu
           rust-toolchain: 1.71.1
           command: build
-          args: -m connectorx-python/Cargo.toml -i python --release --features integrated-auth-gssapi
+          args: -m connectorx-python/Cargo.toml -i python3.9 --release --features integrated-auth-gssapi
+          before-script-linux: |
+            apt-get update -y
+            apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
+      
         env:
           SQLITE3_STATIC: 1
 
@@ -59,7 +63,7 @@ jobs:
           target: aarch64-unknown-linux-gnu
           rust-toolchain: 1.71.1
           command: build
-          args: -m connectorx-python/Cargo.toml -i python --release --features integrated-auth-gssapi
+          args: -m connectorx-python/Cargo.toml -i python3.9 --release --features integrated-auth-gssapi
         env:
           SQLITE3_STATIC: 1
 

@@ -32,6 +32,9 @@ jobs:
           target: ${{ matrix.target }}
           manylinux: auto
           args: --release --out dist -m connectorx-python/Cargo.toml -i python3.9
+          before-script-linux: |
+            apt-get update -y
+            apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib libcurl4-openssl-dev zlib1g-dev
 
       - uses: uraimo/run-on-arch-action@v2.8.1
         if: matrix.target != 'ppc64'

@@ -31,7 +31,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           manylinux: auto
-          args: --release --out dist -m connectorx-python/Cargo.toml -i python3.9 --release
+          args: --release --out dist -m connectorx-python/Cargo.toml -i python3.9
 
       - uses: uraimo/run-on-arch-action@v2.8.1
         if: matrix.target != 'ppc64'

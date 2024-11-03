@@ -29,7 +29,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker buildx create --use
-          docker buildx build --platform linux/arm64 \
+          docker buildx build --platform linux/arm64/v8 \
             --build-arg PYTHON_VERSION=${{ matrix.python-version }}  \
             -f Dockerfile.aarch64 \
             -t connectorx-python-aarch64:latest \
@@ -37,7 +37,7 @@ jobs:
 
       - name: Extract wheel
         run: |
-          docker create --name temp connectorx-python-aarch64:latest
+          docker run --name temp connectorx-python-aarch64:latest &
           sleep 10
 
           WHL_FILENAME=$(docker exec temp ls /workspace/connector-x/connectorx-python/target/wheels)

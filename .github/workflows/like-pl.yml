@@ -149,7 +149,7 @@ jobs:
 
               elif command -v yum >/dev/null 2>&1; then
                   echo "Detected yum package manager. Installing packages using yum..."
-                  sudo yum install -y openssl-devel krb5-devel pkgconfig gcc
+                  yum install -y openssl-devel krb5-devel pkgconfig gcc
                   if [ $? -eq 0 ]; then
                       echo "Packages installed successfully using yum."
                   else
@@ -161,8 +161,8 @@ jobs:
                   exit 1
               fi
 
-              find /usr/lib /usr/local/lib -name "libgssapi_krb5*"
               export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
+              ls -la $LD_LIBRARY_PATH 
 
 
       - name: Test wheel

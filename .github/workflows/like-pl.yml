@@ -141,8 +141,8 @@ jobs:
                   echo "Detected apt-get package manager. Installing packages using apt-get..."
 
                   sudo apt-get update
-                  sudo apt-get install -y libssl-dev openssl pkg-config gcc-aarch64-linux-gnu build-essential
-                  sudo apt-get install -y  libkrb5-dev
+                  sudo apt-get install -y libssl-dev openssl pkg-config gcc-aarch64-linux-gnu build-essential krb5-multidev
+                  sudo apt-get install -y libkrb5-dev_1.17-6ubuntu4_arm64
                   if [ $? -eq 0 ]; then
                       echo "Packages installed successfully using apt-get."
                   else

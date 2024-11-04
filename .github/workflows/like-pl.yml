@@ -47,13 +47,13 @@ jobs:
         with:
           command: sdist
           args: >
-            --manifest-path py-polars/Cargo.toml
+            --manifest-path connectorx-python/Cargo.toml
             --out dist
 
       - name: Test sdist
         run: |
           pip install --force-reinstall --verbose dist/*.tar.gz
-          python -c 'import polars'
+          python -c 'import connectorx'
 
       - name: Upload sdist
         uses: actions/upload-artifact@v4

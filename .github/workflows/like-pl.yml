@@ -50,7 +50,7 @@ jobs:
             --manifest-path connectorx-python/Cargo.toml
             --out dist
           before-script-linux: |
-              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
+              sudo apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
 
       - name: Test sdist
         run: |

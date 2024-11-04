@@ -141,8 +141,8 @@ jobs:
                   echo "Detected apt-get package manager. Installing packages using apt-get..."
 
                   sudo apt-get update
-                  sudo apt-get install -y libssl-dev openssl pkg-config gcc-aarch64-linux-gnu build-essential krb5-multidev
-                  sudo apt-get install -y libkrb5-dev_1.17-6ubuntu4_arm64
+                  sudo apt-get install -y --fix-missing libssl-dev openssl pkg-config gcc-aarch64-linux-gnu build-essential libkrb5-dev clang && apt-get clean && rm -rf /var/lib/apt/lists/*
+
                   if [ $? -eq 0 ]; then
                       echo "Packages installed successfully using apt-get."
                   else
@@ -153,7 +153,8 @@ jobs:
               elif command -v yum >/dev/null 2>&1; then
                   echo "Detected yum package manager. Installing packages using yum..."
                   yum update -y
-                  yum install -y perl-core openssl openssl-devel pkgconfig libatomic clang
+                  yum install epel-release
+                  yum install -y perl-core openssl openssl-devel pkgconfig libatomic libclang
                   if [[ ! -d "/usr/lib64" ]]; then
                     ln -s /usr/lib/libatomic.so.1 /usr/lib/libatomic.so
                   fi

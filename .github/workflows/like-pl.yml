@@ -162,7 +162,6 @@ jobs:
               fi
 
               export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
-              ls -la $LD_LIBRARY_PATH 
 
 
       - name: Test wheel

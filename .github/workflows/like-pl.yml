@@ -1,12 +1,7 @@
 name: Release Python
 
 on:
-  workflow_dispatch:
-    inputs:
-      dry-run:
-        description: Dry run
-        type: boolean
-        default: false
+  push:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

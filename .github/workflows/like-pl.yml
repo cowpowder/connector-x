@@ -134,12 +134,13 @@ jobs:
             --profile dist-release
             --manifest-path connectorx-python/Cargo.toml
             --out dist
+            --release
           manylinux: ${{ matrix.architecture == 'aarch64' && '2_24' || 'auto' }}
           before-script-linux: |
               if command -v apt-get >/dev/null 2>&1; then
                   echo "Detected apt-get package manager. Installing packages using apt-get..."
                   sudo apt-get update
-                  sudo apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
+                  sudo apt-get install -y libssl-dev openssl pkg-config libkrb5-dev:arm64 gcc-aarch64-linux-gnu
                   if [ $? -eq 0 ]; then
                       echo "Packages installed successfully using apt-get."
                   else
@@ -150,13 +151,7 @@ jobs:
               elif command -v yum >/dev/null 2>&1; then
                   echo "Detected yum package manager. Installing packages using yum..."
                   yum update -y
-                  yum install -y perl-core openssl openssl-devel pkgconfig libatomic
-                  if [ $? -eq 0 ]; then
-                      echo "Packages installed successfully using yum."
-                  else
-                      echo "Failed to install packages using yum."
-                      exit 1
-                  fi
+                  yum install -y perl-core openssl openssl-devel pkgconfig libatomic clang
                   if [[ ! -d "/usr/lib64" ]]; then
                     ln -s /usr/lib/libatomic.so.1 /usr/lib/libatomic.so
                   fi

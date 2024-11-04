@@ -136,8 +136,34 @@ jobs:
             --out dist
           manylinux: ${{ matrix.architecture == 'aarch64' && '2_24' || 'auto' }}
           before-script-linux: |
-              apt-get update -y
-              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
+              if command -v apt-get >/dev/null 2>&1; then
+                  echo "Detected apt-get package manager. Installing packages using apt-get..."
+                  sudo apt-get update
+                  sudo apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
+                  if [ $? -eq 0 ]; then
+                      echo "Packages installed successfully using apt-get."
+                  else
+                      echo "Failed to install packages using apt-get."
+                      exit 1
+                  fi
+
+              elif command -v yum >/dev/null 2>&1; then
+                  echo "Detected yum package manager. Installing packages using yum..."
+                  sudo yum install -y openssl-devel krb5-devel pkgconfig gcc
+                  if [ $? -eq 0 ]; then
+                      echo "Packages installed successfully using yum."
+                  else
+                      echo "Failed to install packages using yum."
+                      exit 1
+                  fi
+              else
+                  echo "Neither apt-get nor yum package manager is available."
+                  exit 1
+              fi
+
+              find /usr/lib /usr/local/lib -name "libgssapi_krb5*"
+              export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
+
 
       - name: Test wheel
         # Only test on x86-64 for now as this matches the runner architecture

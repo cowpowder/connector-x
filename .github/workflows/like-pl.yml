@@ -43,12 +43,15 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Create source distribution
-        uses: PyO3/maturin-action@v1
+        uses: PyO3/maturin-action@v1.45
         with:
           command: sdist
           args: >
             --manifest-path connectorx-python/Cargo.toml
             --out dist
+          before-script-linux: |
+              apt-get update -y
+              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
 
       - name: Test sdist
         run: |
@@ -128,11 +131,14 @@ jobs:
           command: build
           target: ${{ steps.target.outputs.target }}
           args: >
-            -i python3
+            -i python3.9
             --profile dist-release
             --manifest-path connectorx-python/Cargo.toml
             --out dist
           manylinux: ${{ matrix.architecture == 'aarch64' && '2_24' || 'auto' }}
+          before-script-linux: |
+              apt-get update -y
+              apt-get install -y libssl-dev openssl pkg-config libkrb5-dev gcc-multilib
 
       - name: Test wheel
         # Only test on x86-64 for now as this matches the runner architecture

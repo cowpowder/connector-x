@@ -128,6 +128,7 @@ jobs:
           command: build
           target: ${{ steps.target.outputs.target }}
           args: >
+            -i python3
             --profile dist-release
             --manifest-path connectorx-python/Cargo.toml
             --out dist

@@ -154,7 +154,7 @@ jobs:
                   echo "Detected yum package manager. Installing packages using yum..."
                   yum update -y
                   yum install epel-release
-                  yum install -y perl-core openssl openssl-devel pkgconfig libatomic libclang
+                  yum install -y perl-core openssl openssl-devel pkgconfig libatomic clang
                   if [[ ! -d "/usr/lib64" ]]; then
                     ln -s /usr/lib/libatomic.so.1 /usr/lib/libatomic.so
                   fi

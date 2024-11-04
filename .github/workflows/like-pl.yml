@@ -150,7 +150,7 @@ jobs:
               elif command -v yum >/dev/null 2>&1; then
                   echo "Detected yum package manager. Installing packages using yum..."
                   yum update -y
-                  yum install -y yum install -y perl-core openssl openssl-devel pkgconfig libatomic
+                  yum install -y perl-core openssl openssl-devel pkgconfig libatomic
                   if [ $? -eq 0 ]; then
                       echo "Packages installed successfully using yum."
                   else

@@ -139,8 +139,10 @@ jobs:
           before-script-linux: |
               if command -v apt-get >/dev/null 2>&1; then
                   echo "Detected apt-get package manager. Installing packages using apt-get..."
+                  sudo dpkg --add-architecture arm64
                   sudo apt-get update
-                  sudo apt-get install -y libssl-dev openssl pkg-config libkrb5-dev:arm64 gcc-aarch64-linux-gnu
+                  sudo apt-get install -y libssl-dev openssl pkg-config gcc-aarch64-linux-gnu build-essential
+                  sudo apt-get install -y  libkrb5-dev
                   if [ $? -eq 0 ]; then
                       echo "Packages installed successfully using apt-get."
                   else

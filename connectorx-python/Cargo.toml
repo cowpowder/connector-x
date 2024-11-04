@@ -82,3 +82,13 @@ srcs = [
   "connectorx/src_trino",
 ]
 integrated-auth-gssapi = ["connectorx/integrated-auth-gssapi"]
+
+[profile.release]
+lto = "thin"
+debug = "line-tables-only"
+
+[profile.dist-release]
+inherits = "release"
+codegen-units = 1
+debug = false
+lto = "fat"
